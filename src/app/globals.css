@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --color-navy: #0b1f3a;
+  --color-navy-light: #14315c;
+  --color-navy-dark: #071427;
+  --color-accent: #3b82f6;
+  --color-accent-light: #60a5fa;
+  --color-accent-soft: #eaf2ff;
+
+  --background: #f6f8fb;
+  --surface: #ffffff;
+  --surface-2: #f1f5f9;
+  --foreground: #0b1f3a;
+  --muted: #64748b;
+  --border: #e2e8f0;
+}
+
+.dark {
+  --background: #060f1f;
+  --surface: #0e2038;
+  --surface-2: #12294a;
+  --foreground: #eef3fb;
+  --muted: #93a5c4;
+  --border: #1c3454;
+  --color-accent-soft: #10233e;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-navy: var(--color-navy);
+  --color-navy-light: var(--color-navy-light);
+  --color-navy-dark: var(--color-navy-dark);
+  --color-accent: var(--color-accent);
+  --color-accent-light: var(--color-accent-light);
+  --color-accent-soft: var(--color-accent-soft);
+  --font-sans: var(--font-inter);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+@layer utilities {
+  .card {
+    @apply bg-surface border border-border rounded-2xl shadow-[0_1px_2px_rgba(11,31,58,0.04),0_8px_24px_-12px_rgba(11,31,58,0.12)];
+  }
+  .transition-smooth {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in {
+  animation: fade-in 0.35s ease both;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-2) 0px, var(--border) 40px, var(--surface-2) 80px);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s linear infinite;
+}
