@@ -1,10 +1,12 @@
 "use client";
 
-import { Download, Eye, FileText, Map, ScrollText, Star, ListTree } from "lucide-react";
+import { useState } from "react";
+import { Download, Eye, FileText, Map, ScrollText, Star, ListTree, Loader2 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { formatFileSize } from "@/utils/format";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useToast } from "@/context/ToastContext";
+import { materialsService } from "@/services/content";
 import type { Material, MaterialType } from "@/types";
 
 const typeMeta: Record<MaterialType, { label: string; icon: typeof FileText; tone: string }> = {
@@ -18,9 +20,39 @@ const typeMeta: Record<MaterialType, { label: string; icon: typeof FileText; ton
 export function MaterialCard({ material }: { material: Material }) {
   const { isFavorited, toggleFavorite } = useFavorites();
   const { showToast } = useToast();
+  const [busy, setBusy] = useState<"preview" | "download" | null>(null);
   const favorited = isFavorited("material", material.id);
   const meta = typeMeta[material.type];
   const Icon = meta.icon;
+
+  const handlePreview = async () => {
+    setBusy("preview");
+    try {
+      const url = await materialsService.getSignedUrl(material.id);
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Não foi possível abrir o arquivo.", "error");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const handleDownload = async () => {
+    setBusy("download");
+    try {
+      const url = await materialsService.getSignedDownloadUrl(material.id, material.name);
+      const a = document.createElement("a");
+      a.href = url;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      showToast(`Baixando "${material.name}"...`, "success");
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Não foi possível baixar o arquivo.", "error");
+    } finally {
+      setBusy(null);
+    }
+  };
 
   return (
     <div className="card p-4 flex items-center gap-4">
@@ -35,21 +67,23 @@ export function MaterialCard({ material }: { material: Material }) {
       </div>
       <div className="flex items-center gap-1.5 shrink-0">
         <button
-          onClick={() => showToast(`Abrindo "${material.name}"...`, "info")}
+          onClick={handlePreview}
+          disabled={busy !== null}
           title="Visualizar"
-          className="size-9 rounded-lg border border-border grid place-items-center text-muted hover:bg-surface-2 transition-smooth"
+          className="size-9 rounded-lg border border-border grid place-items-center text-muted hover:bg-surface-2 transition-smooth disabled:opacity-50"
         >
-          <Eye className="size-4" />
+          {busy === "preview" ? <Loader2 className="size-4 animate-spin" /> : <Eye className="size-4" />}
         </button>
         <button
-          onClick={() => showToast(`Baixando "${material.name}"...`, "success")}
+          onClick={handleDownload}
+          disabled={busy !== null}
           title="Baixar"
-          className="size-9 rounded-lg border border-border grid place-items-center text-muted hover:bg-surface-2 transition-smooth"
+          className="size-9 rounded-lg border border-border grid place-items-center text-muted hover:bg-surface-2 transition-smooth disabled:opacity-50"
         >
-          <Download className="size-4" />
+          {busy === "download" ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
         </button>
         <button
-          onClick={() => toggleFavorite("material", material.id)}
+          onClick={() => toggleFavorite("material", material.id, material.type)}
           title="Favoritar"
           className={cn(
             "size-9 rounded-lg border border-border grid place-items-center transition-smooth",

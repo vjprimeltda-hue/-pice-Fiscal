@@ -6,6 +6,7 @@ import { cn } from "@/utils/cn";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useToast } from "@/context/ToastContext";
 import { Badge } from "@/components/ui/Badge";
+import { questionsService } from "@/services/content";
 import type { Question } from "@/types";
 
 const difficultyTone = {
@@ -37,6 +38,7 @@ export function QuestionCard({ question, index }: { question: Question; index: n
     setAnswered(true);
     const correct = selected === question.correctIndex;
     showToast(correct ? "Resposta correta! Mandou bem." : "Resposta incorreta. Revise o conteúdo.", correct ? "success" : "error");
+    questionsService.recordAttempt(question.id, selected, correct).catch(() => {});
   };
 
   return (

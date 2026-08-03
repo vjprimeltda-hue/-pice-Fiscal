@@ -59,26 +59,47 @@ export default function CalendarioPage() {
     setSelectedDate(toISODate(today));
   };
 
-  const handleSave = (data: Omit<AgendaEvent, "id" | "completed"> & { id?: string }) => {
-    if (data.id) {
-      setEvents((prev) => prev.map((e) => (e.id === data.id ? { ...e, ...data } : e)));
-      showToast("Tarefa atualizada com sucesso.", "success");
-    } else {
-      const newEvent: AgendaEvent = { ...data, id: crypto.randomUUID(), completed: false };
-      setEvents((prev) => [...prev, newEvent]);
-      showToast("Tarefa criada com sucesso.", "success");
+  const handleSave = async (data: Omit<AgendaEvent, "id" | "completed"> & { id?: string }) => {
+    try {
+      if (data.id) {
+        const updated = await agendaService.update(data.id, data);
+        setEvents((prev) => prev.map((e) => (e.id === updated.id ? updated : e)));
+        showToast("Tarefa atualizada com sucesso.", "success");
+      } else {
+        const created = await agendaService.create(data);
+        setEvents((prev) => [...prev, created]);
+        showToast("Tarefa criada com sucesso.", "success");
+      }
+      setModalOpen(false);
+      setEditingEvent(null);
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "Não foi possível salvar a tarefa.", "error");
     }
-    setModalOpen(false);
-    setEditingEvent(null);
   };
 
-  const handleToggleComplete = (id: string) => {
-    setEvents((prev) => prev.map((e) => (e.id === id ? { ...e, completed: !e.completed } : e)));
+  const handleToggleComplete = async (id: string) => {
+    const current = events.find((e) => e.id === id);
+    if (!current) return;
+    const next = !current.completed;
+    setEvents((prev) => prev.map((e) => (e.id === id ? { ...e, completed: next } : e)));
+    try {
+      await agendaService.setCompleted(id, next);
+    } catch {
+      setEvents((prev) => prev.map((e) => (e.id === id ? { ...e, completed: !next } : e)));
+      showToast("Não foi possível atualizar a tarefa.", "error");
+    }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
+    const previous = events;
     setEvents((prev) => prev.filter((e) => e.id !== id));
-    showToast("Tarefa excluída.", "info");
+    try {
+      await agendaService.remove(id);
+      showToast("Tarefa excluída.", "info");
+    } catch {
+      setEvents(previous);
+      showToast("Não foi possível excluir a tarefa.", "error");
+    }
   };
 
   const openCreate = (date: string) => {

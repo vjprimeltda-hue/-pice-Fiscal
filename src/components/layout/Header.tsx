@@ -8,22 +8,29 @@ import { cn } from "@/utils/cn";
 import { useSidebar } from "@/context/SidebarContext";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
-import { notifications as mockNotifications } from "@/data/mock";
+import { notificationsService } from "@/services/content";
 import { initials, formatRelativeDate } from "@/utils/format";
+import type { Notification } from "@/types";
 
 export function Header() {
   const { setMobileOpen } = useSidebar();
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth();
   const { showToast } = useToast();
   const router = useRouter();
 
   const [notifOpen, setNotifOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [unread, setUnread] = useState(mockNotifications.filter((n) => !n.read).length);
+  const [notificationList, setNotificationList] = useState<Notification[]>([]);
+  const unread = notificationList.filter((n) => !n.read).length;
 
   const notifRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    notificationsService.list().then(setNotificationList).catch(() => {});
+  }, [isAuthenticated]);
 
   useEffect(() => {
     function onClick(e: MouseEvent) {
@@ -33,6 +40,15 @@ export function Header() {
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
+
+  const handleMarkAllRead = async () => {
+    setNotificationList((prev) => prev.map((n) => ({ ...n, read: true })));
+    try {
+      await notificationsService.markAllRead();
+    } catch {
+      showToast("Não foi possível marcar as notificações como lidas.", "error");
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -84,7 +100,7 @@ export function Header() {
                 <span className="text-sm font-semibold">Notificações</span>
                 {unread > 0 && (
                   <button
-                    onClick={() => setUnread(0)}
+                    onClick={handleMarkAllRead}
                     className="text-xs text-accent hover:underline"
                   >
                     Marcar todas como lidas
@@ -92,7 +108,10 @@ export function Header() {
                 )}
               </div>
               <div className="flex flex-col">
-                {mockNotifications.map((n) => (
+                {notificationList.length === 0 && (
+                  <p className="text-xs text-muted px-2 py-4 text-center">Nenhuma notificação por aqui.</p>
+                )}
+                {notificationList.map((n) => (
                   <div
                     key={n.id}
                     className={cn(

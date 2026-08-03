@@ -33,10 +33,18 @@ export async function uploadAvatar(file: File, userId: string): Promise<string> 
   return supabase.storage.from("avatars").getPublicUrl(path).data.publicUrl;
 }
 
-/** Short-lived signed URL to download/preview a private material file. */
+/** Short-lived signed URL to preview a private material file inline. */
 export async function getMaterialSignedUrl(path: string, expiresInSeconds = 120): Promise<string> {
   const supabase = createClient();
   const { data, error } = await supabase.storage.from("materials").createSignedUrl(path, expiresInSeconds);
+  if (error || !data) throw error ?? new Error("Não foi possível gerar o link de download.");
+  return data.signedUrl;
+}
+
+/** Short-lived signed URL that forces a browser download (Content-Disposition: attachment). */
+export async function getMaterialSignedDownloadUrl(path: string, fileName: string, expiresInSeconds = 120): Promise<string> {
+  const supabase = createClient();
+  const { data, error } = await supabase.storage.from("materials").createSignedUrl(path, expiresInSeconds, { download: fileName });
   if (error || !data) throw error ?? new Error("Não foi possível gerar o link de download.");
   return data.signedUrl;
 }
