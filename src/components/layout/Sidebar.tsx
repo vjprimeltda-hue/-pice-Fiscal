@@ -16,7 +16,6 @@ import {
   ChevronsLeft,
   ChevronsRight,
   X,
-  GraduationCap,
   ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
@@ -52,10 +51,11 @@ export function Sidebar() {
   const content = (
     <div className="flex h-full flex-col bg-navy text-white">
       <div className={cn("flex items-center gap-3 h-16 px-5 shrink-0", collapsed && "justify-center px-0")}>
-        <div className="size-9 rounded-xl bg-gradient-to-br from-accent to-accent-light grid place-items-center shrink-0">
-          <GraduationCap className="size-5 text-navy" strokeWidth={2.5} />
-        </div>
-        {!collapsed && <span className="font-semibold text-lg tracking-tight">Ápice Fiscal</span>}
+        {collapsed ? (
+          <img src="/logo-icon.png" alt="Ápice Fiscal" className="h-8 w-auto shrink-0" />
+        ) : (
+          <img src="/logo-wide.png" alt="Ápice Fiscal" className="h-8 w-auto shrink-0" />
+        )}
         <button
           onClick={() => setMobileOpen(false)}
           className="ml-auto lg:hidden text-white/70 hover:text-white"

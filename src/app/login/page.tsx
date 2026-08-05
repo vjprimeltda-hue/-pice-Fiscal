@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Eye, EyeOff, GraduationCap, Lock, Mail, ShieldCheck, TrendingUp, Video } from "lucide-react";
+import { Eye, EyeOff, Lock, Mail, ShieldCheck, TrendingUp, Video } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/context/AuthContext";
@@ -78,10 +78,7 @@ function LoginPageInner() {
         <div className="absolute bottom-0 left-0 size-72 rounded-full bg-accent-light/10 blur-3xl" />
 
         <div className="relative flex items-center gap-3">
-          <div className="size-11 rounded-xl bg-gradient-to-br from-accent to-accent-light grid place-items-center">
-            <GraduationCap className="size-6 text-navy" strokeWidth={2.5} />
-          </div>
-          <span className="font-semibold text-2xl tracking-tight">Ápice Fiscal</span>
+          <img src="/logo.png" alt="Ápice Fiscal" className="h-14 w-auto" />
         </div>
 
         <div className="relative max-w-md">
@@ -120,10 +117,7 @@ function LoginPageInner() {
       <div className="flex items-center justify-center p-6 sm:p-10">
         <div className="w-full max-w-sm">
           <div className="flex lg:hidden items-center gap-3 mb-10 justify-center">
-            <div className="size-10 rounded-xl bg-gradient-to-br from-navy to-navy-light grid place-items-center">
-              <GraduationCap className="size-5 text-accent-light" strokeWidth={2.5} />
-            </div>
-            <span className="font-semibold text-xl text-foreground tracking-tight">Ápice Fiscal</span>
+            <img src="/logo-wide.png" alt="Ápice Fiscal" className="h-9 w-auto" />
           </div>
 
           <h2 className="text-2xl font-bold text-foreground">Entrar na plataforma</h2>

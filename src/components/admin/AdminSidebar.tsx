@@ -14,7 +14,6 @@ import {
   Bell,
   LogOut,
   ArrowLeft,
-  GraduationCap,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useAuth } from "@/context/AuthContext";
@@ -47,11 +46,8 @@ export function AdminSidebar() {
   return (
     <aside className="hidden lg:flex flex-col shrink-0 w-64 h-screen sticky top-0 bg-navy text-white">
       <div className="flex items-center gap-3 h-16 px-5 shrink-0">
-        <div className="size-9 rounded-xl bg-gradient-to-br from-accent to-accent-light grid place-items-center shrink-0">
-          <GraduationCap className="size-5 text-navy" strokeWidth={2.5} />
-        </div>
+        <img src="/logo-wide.png" alt="Ápice Fiscal" className="h-7 w-auto shrink-0" />
         <div className="leading-tight">
-          <p className="font-semibold text-sm tracking-tight">Ápice Fiscal</p>
           <p className="text-[11px] text-white/50">Painel administrativo</p>
         </div>
       </div>

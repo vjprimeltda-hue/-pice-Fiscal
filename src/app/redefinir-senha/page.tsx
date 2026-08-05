@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { GraduationCap, Lock, Eye, EyeOff } from "lucide-react";
+import { Lock, Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/context/AuthContext";
@@ -64,10 +64,7 @@ export default function ResetPasswordPage() {
     <div className="min-h-screen grid place-items-center bg-background p-6">
       <div className="w-full max-w-sm">
         <div className="flex items-center gap-3 mb-8 justify-center">
-          <div className="size-10 rounded-xl bg-gradient-to-br from-navy to-navy-light grid place-items-center">
-            <GraduationCap className="size-5 text-accent-light" strokeWidth={2.5} />
-          </div>
-          <span className="font-semibold text-xl text-foreground tracking-tight">Ápice Fiscal</span>
+          <img src="/logo-wide.png" alt="Ápice Fiscal" className="h-9 w-auto" />
         </div>
 
         {checkingSession ? (
