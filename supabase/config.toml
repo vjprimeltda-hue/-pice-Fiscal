@@ -42,6 +42,9 @@ policy = "oneshot"
 [functions.mercadopago-webhook]
 verify_jwt = false
 
+[functions.kirvano-webhook]
+verify_jwt = false
+
 [functions.create-subscription]
 verify_jwt = true
 

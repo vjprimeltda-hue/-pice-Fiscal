@@ -19,9 +19,11 @@ supabase/
     0007_storage.sql                # buckets avatars / lesson-thumbnails / materials + policies
     0008_rls_policies.sql           # todas as políticas RLS de tabelas
     0009_progress_functions.sql     # RPCs de progresso (dashboard do aluno)
+    0010_kirvano.sql                # colunas kirvano_* em plans/subscriptions/payments
   functions/
     _shared/                        # cors.ts, supabase.ts, mercadopago.ts (helpers)
     mercadopago-webhook/            # público (verify_jwt=false) — sincroniza pagamentos/assinaturas
+    kirvano-webhook/                # público (verify_jwt=false) — cria conta + assinatura em SALE_APPROVED
     create-subscription/            # autenticado — cria preapproval no Mercado Pago
     cancel-subscription/            # autenticado — cancela a assinatura do usuário
     get-material-url/               # autenticado — URL assinada de material, gateada por assinatura ativa
@@ -34,6 +36,7 @@ Deploy (não precisa de Docker rodando):
 
 ```bash
 supabase functions deploy mercadopago-webhook --no-verify-jwt
+supabase functions deploy kirvano-webhook --no-verify-jwt
 supabase functions deploy create-subscription
 supabase functions deploy cancel-subscription
 supabase functions deploy get-material-url
@@ -45,6 +48,7 @@ Segredos usados pelas functions (nunca commitados — configure com `supabase se
 ```bash
 supabase secrets set MERCADO_PAGO_ACCESS_TOKEN=xxx
 supabase secrets set MERCADO_PAGO_WEBHOOK_SECRET=xxx
+supabase secrets set KIRVANO_WEBHOOK_TOKEN=xxx
 supabase secrets set SITE_URL=https://seu-dominio.com
 ```
 
@@ -52,6 +56,43 @@ supabase secrets set SITE_URL=https://seu-dominio.com
 
 Registre a URL do webhook no painel do Mercado Pago (Sua integração → Webhooks):
 `https://<project-ref>.functions.supabase.co/mercadopago-webhook`
+
+### Kirvano (checkout externo → criação automática de conta)
+
+Fluxo: venda aprovada na Kirvano → `kirvano-webhook` → cria o usuário via
+`auth.admin.inviteUserByEmail` (o Supabase manda o e-mail de "definir senha"
+sozinho, template em Authentication → Email Templates → Invite user) → grava
+a assinatura já `active` vinculada a esse usuário.
+
+Passos:
+
+1. Rode a migration `0010_kirvano.sql` (via `supabase db push`) — ela adiciona
+   `plans.kirvano_product_id`, `subscriptions.kirvano_sale_id` e
+   `payments.kirvano_transaction_id`.
+2. Preencha `kirvano_product_id` de cada linha em `plans` com o ID do
+   produto/oferta correspondente na Kirvano (o webhook usa esse campo para
+   descobrir qual plano ativar).
+3. `supabase secrets set KIRVANO_WEBHOOK_TOKEN=xxx` — o mesmo token que você
+   configurar no painel da Kirvano (Integrações → Webhooks → Token de
+   segurança). Sem essa secret configurada, o endpoint aceita qualquer
+   chamada (ok só em teste local).
+4. `supabase functions deploy kirvano-webhook --no-verify-jwt` (obrigatório —
+   quem chama é a Kirvano, não um usuário logado).
+5. Registre `https://<project-ref>.functions.supabase.co/kirvano-webhook` no
+   painel da Kirvano.
+6. Personalize o e-mail de convite em Authentication → Email Templates →
+   Invite user (o padrão do Supabase tem a cara do Supabase).
+
+O link de "definir senha" do convite expira em 24h por padrão; para reenviar
+depois desse prazo, chame `auth.admin.inviteUserByEmail` de novo para o mesmo
+e-mail (ou `resetPasswordForEmail`) — não há isso pronto na function ainda,
+adicione um botão "reenviar acesso" no admin se precisar.
+
+> ⚠️ `kirvano-webhook` lê o token no header `security-token` (com fallback
+> para `?token=` na URL). Confirme no painel da Kirvano qual header/formato
+> ela realmente envia para a sua conta e ajuste `getProvidedToken` na function
+> se for diferente — não há documentação pública estável o suficiente para eu
+> garantir esse nome sem você conferir.
 
 ### Bootstrap do primeiro admin
 
@@ -106,7 +147,7 @@ update public.profiles set role = 'admin' where email = 'seu-email@exemplo.com';
 - **favorites** — favoritos (vídeo, pdf, exercício, mapa mental).
 - **agenda_events** — calendário de estudos do aluno.
 - **notifications** — notificações pessoais ou broadcast (`user_id is null`).
-- **plans / subscriptions / payments** — assinatura e cobrança via Mercado Pago.
+- **plans / subscriptions / payments** — assinatura e cobrança via Mercado Pago ou Kirvano.
 - **admin_logs** — auditoria de ações administrativas.
 
 Todas as tabelas têm RLS habilitada; a função `public.is_admin()` (SECURITY DEFINER)
