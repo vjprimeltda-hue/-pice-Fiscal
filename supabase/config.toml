@@ -16,6 +16,19 @@ enabled = true
 port = 54323
 
 [auth]
+# WARNING: `supabase config push` has been observed silently resetting the
+# "Enable email provider" toggle to off in the Dashboard (Authentication >
+# Sign In / Providers > Email) even when this file sets [auth.email] enabled
+# = true — it broke login for every existing user on 2026-08-12. Cause not
+# fully understood (schema mismatch between this CLI version and the
+# project's remote config). Until that's root-caused, change Auth settings
+# only via the Dashboard UI, and if `config push` must run, immediately
+# verify afterwards with:
+#   curl -X POST https://brekjxlzxuzrlmzrauxp.supabase.co/auth/v1/recover \
+#     -H "apikey: <anon key>" -H "Content-Type: application/json" \
+#     -d '{"email":"<any real user's email>"}'
+# A 200 means email login is enabled; "email_provider_disabled" means it was
+# just reset and must be flipped back on in the Dashboard immediately.
 enabled = true
 site_url = "https://pice-fiscal.vercel.app"
 additional_redirect_urls = ["https://pice-fiscal.vercel.app/**", "http://localhost:3000/**"]
@@ -29,6 +42,10 @@ enable_signup = false
 minimum_password_length = 8
 
 [auth.email]
+# Explicit: `supabase config push` treats an omitted key as its CLI default
+# (false), not "leave remote unchanged" — omitting this previously disabled
+# email/password login for every existing user, not just new signups.
+enabled = true
 enable_signup = false
 enable_confirmations = true
 double_confirm_changes = true
