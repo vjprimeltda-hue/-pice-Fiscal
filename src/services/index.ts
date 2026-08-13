@@ -17,3 +17,7 @@ export { subjectsService, lessonsService, materialsService, questionsService, no
 
 // agendaService — see src/services/agenda.ts.
 export { agendaService } from "@/services/agenda";
+
+// billingService — own subscription status + active plan catalog, see
+// src/services/billing.ts.
+export { billingService } from "@/services/billing";

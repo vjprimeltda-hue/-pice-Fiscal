@@ -289,6 +289,10 @@ export interface Database {
         Args: { p_minutes: number };
         Returns: undefined;
       };
+      has_active_subscription: {
+        Args: { check_user_id: string };
+        Returns: boolean;
+      };
     };
   };
 }

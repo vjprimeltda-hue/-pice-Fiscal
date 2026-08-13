@@ -15,3 +15,9 @@ function required(name: string, value: string | undefined): string {
 export const supabaseUrl = () => required("NEXT_PUBLIC_SUPABASE_URL", process.env.NEXT_PUBLIC_SUPABASE_URL);
 export const supabaseAnonKey = () =>
   required("NEXT_PUBLIC_SUPABASE_ANON_KEY", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+
+// Optional: link to the Kirvano checkout page for the "Acesso Vitalício"
+// product, shown as the CTA on /assinatura. Not `required()` since the
+// paywall page must still render (without a working buy button) if this
+// hasn't been configured yet.
+export const kirvanoCheckoutUrl = () => process.env.NEXT_PUBLIC_KIRVANO_CHECKOUT_URL || null;

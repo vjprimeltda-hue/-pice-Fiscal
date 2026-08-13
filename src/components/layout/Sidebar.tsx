@@ -17,6 +17,7 @@ import {
   ChevronsRight,
   X,
   ShieldCheck,
+  CreditCard,
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useSidebar } from "@/context/SidebarContext";
@@ -31,6 +32,7 @@ const navItems = [
   { href: "/calendario", label: "Calendário", icon: CalendarDays },
   { href: "/plano-de-estudos", label: "Plano de Estudos", icon: ClipboardList },
   { href: "/favoritos", label: "Favoritos", icon: Star },
+  { href: "/assinatura", label: "Assinatura", icon: CreditCard },
   { href: "/perfil", label: "Meu Perfil", icon: User },
   { href: "/configuracoes", label: "Configurações", icon: Settings },
 ];

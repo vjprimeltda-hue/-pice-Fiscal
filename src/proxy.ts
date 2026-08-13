@@ -3,7 +3,18 @@ import { createServerClient } from "@supabase/ssr";
 import type { Database } from "@/types/database";
 import { supabaseAnonKey, supabaseUrl } from "@/lib/supabase/env";
 
-const APP_ROUTES = ["/dashboard", "/materiais", "/videoaulas", "/questoes", "/calendario", "/favoritos", "/perfil", "/configuracoes"];
+const APP_ROUTES = [
+  "/dashboard",
+  "/materiais",
+  "/videoaulas",
+  "/questoes",
+  "/calendario",
+  "/plano-de-estudos",
+  "/favoritos",
+  "/perfil",
+  "/configuracoes",
+  "/assinatura",
+];
 const ADMIN_ROUTES = ["/admin"];
 const AUTH_ROUTES = ["/login", "/criar-conta", "/esqueci-senha"];
 
