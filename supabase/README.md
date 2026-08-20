@@ -66,12 +66,14 @@ a assinatura já `active` vinculada a esse usuário.
 
 Passos:
 
-1. Rode a migration `0010_kirvano.sql` (via `supabase db push`) — ela adiciona
-   `plans.kirvano_product_id`, `subscriptions.kirvano_sale_id` e
-   `payments.kirvano_transaction_id`.
-2. Preencha `kirvano_product_id` de cada linha em `plans` com o ID do
-   produto/oferta correspondente na Kirvano (o webhook usa esse campo para
-   descobrir qual plano ativar).
+1. Rode as migrations `0010_kirvano.sql` e `0015_kirvano_offer_ids.sql` (via
+   `supabase db push`) — elas adicionam `plans.kirvano_offer_ids` (array),
+   `subscriptions.kirvano_sale_id` e `payments.kirvano_transaction_id`.
+2. Preencha `kirvano_offer_ids` de cada linha em `plans` com o(s)
+   `offer_id`(s) correspondente(s) na Kirvano — um plano pode ter mais de uma
+   oferta vinculada (ex.: a oferta real de venda e uma oferta "TESTE" para QA
+   manual). O webhook usa esse campo (`.contains`) para descobrir qual plano
+   ativar a partir de `products[0].offer_id` no payload da venda.
 3. `supabase secrets set KIRVANO_WEBHOOK_TOKEN=xxx` — o mesmo token que você
    configurar no painel da Kirvano (Integrações → Webhooks → Token de
    segurança). Sem essa secret configurada, o endpoint aceita qualquer

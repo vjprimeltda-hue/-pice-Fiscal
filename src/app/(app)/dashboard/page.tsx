@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { WelcomeCard } from "@/components/dashboard/WelcomeCard";
+import { WelcomePasswordBanner } from "@/components/dashboard/WelcomePasswordBanner";
 import { SummaryCards } from "@/components/dashboard/SummaryCards";
 import { WeeklyChart } from "@/components/dashboard/WeeklyChart";
 import { MonthlyChart } from "@/components/dashboard/MonthlyChart";
@@ -15,7 +17,17 @@ import { activityService, coursesService, progressService } from "@/services";
 import type { Course, Progress, RecentActivity } from "@/types";
 
 export default function DashboardPage() {
+  return (
+    <Suspense fallback={null}>
+      <DashboardPageInner />
+    </Suspense>
+  );
+}
+
+function DashboardPageInner() {
   const { user } = useAuth();
+  const searchParams = useSearchParams();
+  const showWelcomeBanner = searchParams.get("bemvindo") === "1";
   const [progress, setProgress] = useState<Progress | null>(null);
   const [activities, setActivities] = useState<RecentActivity[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
@@ -52,6 +64,8 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {showWelcomeBanner && <WelcomePasswordBanner />}
+
       <WelcomeCard name={user?.name ?? "Aluno"} />
 
       <SummaryCards progress={progress} />

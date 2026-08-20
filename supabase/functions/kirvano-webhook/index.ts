@@ -75,7 +75,7 @@ Deno.serve(async (req) => {
       const { data: plan } = await supabase
         .from("plans")
         .select("id")
-        .eq("kirvano_product_id", productId ?? "")
+        .contains("kirvano_offer_ids", [productId ?? ""])
         .maybeSingle();
 
       if (!plan) {
@@ -86,10 +86,14 @@ Deno.serve(async (req) => {
         return jsonResponse({ ok: true, ignored: true });
       }
 
+      // Clicking the invite link already authenticates the buyer (Supabase
+      // verifies the OTP and establishes a session before redirecting here)
+      // — sending them to the dashboard already logged in instead of forcing
+      // a "set your password" step first.
       const siteUrl = Deno.env.get("SITE_URL") ?? "http://localhost:3000";
       const { data: invited, error: inviteError } = await supabase.auth.admin.inviteUserByEmail(email, {
         data: { name: name ?? email.split("@")[0] },
-        redirectTo: `${siteUrl}/redefinir-senha`,
+        redirectTo: `${siteUrl}/dashboard?bemvindo=1`,
       });
 
       let userId = invited?.user?.id;
