@@ -35,10 +35,11 @@ additional_redirect_urls = ["https://pice-fiscal.vercel.app/**", "http://localho
 jwt_expiry = 3600
 enable_refresh_token_rotation = true
 refresh_token_reuse_interval = 10
-# Accounts are only ever created by the kirvano-webhook Edge Function (via
-# admin.inviteUserByEmail, which is unaffected by this flag) after a Kirvano
-# sale is approved. Public self-signup would let anyone get a free account.
-enable_signup = false
+# Public self-signup is intentionally on (decision 2026-08-21): anyone can
+# create a free account from /criar-conta. There is still no subscription
+# gate anywhere in the app, so a self-signed-up account gets the same full
+# access as a paying buyer — this is a deliberate choice, not an oversight.
+enable_signup = true
 minimum_password_length = 8
 
 [auth.email]
@@ -46,7 +47,7 @@ minimum_password_length = 8
 # (false), not "leave remote unchanged" — omitting this previously disabled
 # email/password login for every existing user, not just new signups.
 enabled = true
-enable_signup = false
+enable_signup = true
 enable_confirmations = true
 double_confirm_changes = true
 secure_password_change = true
@@ -65,6 +66,18 @@ otp_expiry = 86400
 [auth.email.template.invite]
 subject = "Bem-vindo à Ápice Fiscal — crie sua conta"
 content_path = "./supabase/templates/invite.html"
+
+# Without this, recovery emails use Supabase's default template, whose
+# {{ .ConfirmationURL }} points at this project's own /auth/v1/verify
+# endpoint. That endpoint verifies server-side and redirects back with the
+# session in the URL *hash fragment* (#access_token=...), which /auth/confirm
+# never sees (it only reads the query string) — every recovery link landed on
+# the "Link inválido" screen. This template instead builds the link the same
+# way invite.html does: straight to /auth/confirm?token_hash=...&type=...,
+# so verification happens through our own OTP check.
+[auth.email.template.recovery]
+subject = "Redefinir sua senha — Ápice Fiscal"
+content_path = "./supabase/templates/recovery.html"
 
 # Custom SMTP (Resend) — the free-tier default Supabase mailer can't use
 # custom templates and has a very low send rate limit, which was silently

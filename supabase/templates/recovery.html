@@ -20,31 +20,28 @@
             </tr>
             <tr>
               <td style="padding:36px 32px 8px;">
-                <h1 style="margin:0 0 16px; font-size:20px; color:#1a1a1a;">Seja bem-vindo(a) à Ápice Fiscal 🎉</h1>
+                <h1 style="margin:0 0 16px; font-size:20px; color:#1a1a1a;">Redefinir sua senha</h1>
                 <p style="margin:0 0 16px; font-size:15px; line-height:1.6; color:#4b4b4b;">
-                  Sua compra foi aprovada! Falta só um passo para criar sua conta e liberar seu acesso:
-                  clique no botão abaixo e defina sua senha.
+                  Recebemos um pedido para redefinir a senha da sua conta. Clique no botão abaixo
+                  para escolher uma nova senha.
                 </p>
               </td>
             </tr>
             <tr>
               <td align="center" style="padding:8px 32px 32px;">
                 <a
-                  href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type={{ .Type }}&amp;next=/dashboard%3Fbemvindo%3D1"
+                  href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type={{ .Type }}&amp;next=/redefinir-senha"
                   style="display:inline-block; background-color:#d4af62; color:#0b1f3a; font-weight:bold; font-size:15px; text-decoration:none; padding:14px 32px; border-radius:10px;"
                 >
-                  Criar minha conta
+                  Redefinir minha senha
                 </a>
               </td>
             </tr>
             <tr>
               <td style="padding:0 32px 32px;">
                 <p style="margin:0 0 8px; font-size:13px; line-height:1.6; color:#8a8a8a;">
-                  Este link expira em 24 horas. Se ele expirar antes de você usá-lo, entre em contato
-                  com o suporte para receber um novo acesso.
-                </p>
-                <p style="margin:0; font-size:13px; line-height:1.6; color:#8a8a8a;">
-                  Se você não fez essa compra, pode ignorar este e-mail com segurança.
+                  Este link expira em 1 hora. Se você não pediu essa redefinição, pode ignorar este
+                  e-mail com segurança — sua senha continua a mesma.
                 </p>
               </td>
             </tr>
