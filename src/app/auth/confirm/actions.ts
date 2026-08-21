@@ -24,6 +24,11 @@ export async function confirmEmailLink(formData: FormData) {
     if (!error) {
       redirect(type === "recovery" ? "/redefinir-senha" : next);
     }
+
+    // Token was present but rejected (expired/already used) — send them to
+    // the manual-code fallback instead of a dead-end, since the email also
+    // printed the raw 6-digit OTP next to this same link.
+    redirect(`/auth/codigo?type=${type}&next=${encodeURIComponent(next)}`);
   }
 
   redirect("/login?error=link_invalido");

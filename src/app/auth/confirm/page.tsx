@@ -28,6 +28,12 @@ export default async function ConfirmPage({
             <Link href="/login" className="inline-block mt-5">
               <Button>Voltar para o login</Button>
             </Link>
+            <p className="text-muted text-xs mt-4">
+              Tem o código de 6 dígitos do email?{" "}
+              <Link href="/auth/codigo" className="text-accent font-semibold hover:underline">
+                Entrar com código
+              </Link>
+            </p>
           </div>
         </div>
       </div>
@@ -52,6 +58,15 @@ export default async function ConfirmPage({
             Confirmar e entrar
           </Button>
         </form>
+        <p className="text-muted text-xs mt-4">
+          Botão não funcionou?{" "}
+          <Link
+            href={`/auth/codigo?type=${type}&next=${encodeURIComponent(next ?? "/dashboard")}`}
+            className="text-accent font-semibold hover:underline"
+          >
+            Entrar com código
+          </Link>
+        </p>
       </div>
     </div>
   );

@@ -80,6 +80,22 @@ export const authService = {
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     if (error) throw error;
   },
+
+  /**
+   * Fallback for when the emailed link itself doesn't survive the trip
+   * (email clients/scanners that rewrite or truncate URLs) — the invite and
+   * recovery emails also print the raw 6-digit OTP, which the user can type
+   * in manually here instead of clicking the button.
+   */
+  async verifyCode(params: { email: string; code: string; type: "invite" | "recovery" }): Promise<void> {
+    const supabase = createClient();
+    const { error } = await supabase.auth.verifyOtp({
+      email: params.email,
+      token: params.code,
+      type: params.type,
+    });
+    if (error) throw error;
+  },
 };
 
 export const userService = {

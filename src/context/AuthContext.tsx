@@ -15,6 +15,7 @@ interface AuthContextValue {
   logout: () => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
   updatePassword: (newPassword: string) => Promise<void>;
+  verifyCode: (params: { email: string; code: string; type: "invite" | "recovery" }) => Promise<void>;
   updateUser: (data: Partial<User>) => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -81,6 +82,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await authService.updatePassword(newPassword);
   };
 
+  const verifyCode: AuthContextValue["verifyCode"] = async (params) => {
+    await authService.verifyCode(params);
+    const current = await userService.getCurrentUser();
+    setUser(current);
+  };
+
   const updateUser = async (data: Partial<User>) => {
     const updated = await userService.updateUser(data);
     setUser(updated);
@@ -98,6 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         sendPasswordReset,
         updatePassword,
+        verifyCode,
         updateUser,
         refreshUser,
       }}
